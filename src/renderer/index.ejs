@@ -13,7 +13,7 @@
   </body>
   <script>
     window.electron.ipcRenderer.once('ipc-example', (arg) => {
-      console.log(arg);
+      document.title = arg
     });
 
     window.electron.ipcRenderer.myPing();

@@ -9,11 +9,13 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { TuringProxy } from 'turing-exp';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { test } from './test';
 
 export default class AppUpdater {
   constructor() {
@@ -26,9 +28,22 @@ export default class AppUpdater {
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets');
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths);
+  };
+
+  const turingDllPath = getAssetPath('dll/TURING.dll');
+  const turingExePath = getAssetPath('dll/turing.exe');
+  const nodeWinaxPath = getAssetPath('dll/node_activex.node');
+  const tp = new TuringProxy(turingDllPath, turingExePath, nodeWinaxPath);
+  // eslint-disable-next-line promise/catch-or-return
+  tp.exec(null, test).then((v) => {
+    event.reply('ipc-example', v);
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {
