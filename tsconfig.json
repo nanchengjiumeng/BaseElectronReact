@@ -6,8 +6,12 @@
     "declaration": true,
     "declarationMap": true,
     "jsx": "react-jsx",
-    "strict": true,
+    "strict": false,
+<<<<<<< Updated upstream
     "pretty": true,
+=======
+    "pretty": false,
+>>>>>>> Stashed changes
     "sourceMap": true,
     "baseUrl": "./src",
     "noUnusedLocals": true,
